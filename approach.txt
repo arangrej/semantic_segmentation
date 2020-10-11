@@ -42,5 +42,8 @@ Data Augmentation = HorizontalFlip, RandomCrop, RandomRotate90, ShiftScaleRotate
 
 Evaluation results:
 
-Best validation IoU = ~0.67
-Best validation Accuracy = 96%
+Validation IoU = 0.67
+Validation Accuracy = 0.96
+Validation Precision = 0.83
+Validation Recall = 0.76
+Validation F1-Score = 0.8
