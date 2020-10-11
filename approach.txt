@@ -1,0 +1,46 @@
+Approach:
+
+Since we want to classify each pixel into road vs non_road, I treated this problem as a semantic segmentation problem.
+We can solve this problem using some kind of encoder-decoder architecture where the encoder tries to build complex feature maps by downsampling the input image, which can help in classifying road vs non_road. On the other hand, the decoder will try to generate the corresponding binary (single channel) satellite image. One of the popular architectures for this is UNet in which there are 5 downsampling layers and 5 upsampling layers. If both train and test accuracies are not good, we can increase the number of layers in the network to increase the complexity by adding more parameters or even trying out different architectures.
+
+I had the following approach and thought process:
+
+1. Since the original image size is 1500 x 1500 pixels, it was creating a problem at the time of training because of memory constraints on my machine. Thus, I resized the images to 224 x 224 and trained the model.
+
+2. After the first run of the training, I was not getting improvement in IoU beyond 0.15. Thus I increased the learning rate to have larger updates in the initial iterations. After trying out a couple of optimizer hyperparameters, I was able to achieve a validation IoU of 0.62 and a validation accuracy of 0.93.
+
+3. Then I included some augmentation techniques such as RandomCrop, VerticalFlip, HorizontalFlip, RandomRotate90, ShiftScaleRotate,  Transpose, Blur, Jitter, etc. After trying out various augmentations, I finalized some of them based on the improvements I got. After including augmentation techniques, I was able to get a validation IoU of 0.67 and a validation accuracy of 0.94.
+
+4. To keep high-resolution images, I cropped original images into smaller chunks so that I don't lose the higher resolution. But because of time constraints, I could try a few hyperparameters settings using this approach which led me to a validation IoU of ~0.66 and a validation accuracy of 0.96%. But it may be possible that more hyperparameter tuning can further increase the IoU and accuracy in both cropped and uncropped images, due to time constraints and lack of high-end GPU I wasn't able to tune the model further.
+
+5. Some post-processing can be applied by doing statistical analysis of the pixels near to the detected roads. This post-processing can avoid some true negative pixel scenarios.
+
+6. Overall hyperparameters/tuning parameters tried:
+
+	a. Optimizers and corresponding hyperparameters such as learning rate, decay, etc
+	b. Regularisation
+	c. Data augmentation
+	d. Different loss functions such as binary cross-entropy, BCE + Jaccard, etc
+	e. Data normalization
+
+7. Due to time constraints many things I could not try:
+
+	a. Weight initialization strategies such as Xavier initialization etc
+	b. Adding residual layers in the network. Being more creative in the network design.
+	c. Batch normalization
+	d. Dropout / Drop connect / Max out regularization
+	e. Use of transfer learning using some pre-trained model
+	f. Some post-processing can be applied by doing statistical analysis of the pixels near to the detected roads. This post-processing can avoid some true negative pixel scenarios.
+
+Experimental settings for the final model:
+
+Epochs = 150 (With early stopping)
+Batch Size = 24
+Optimizer = Adam
+Learning rate = 1e-3
+Data Augmentation = HorizontalFlip, RandomCrop, RandomRotate90, ShiftScaleRotate, Transpose, VerticalFlip
+
+Evaluation results:
+
+Best validation IoU = ~0.67
+Best validation Accuracy = 96%

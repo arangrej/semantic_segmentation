@@ -19,3 +19,5 @@ python train.py --epochs=140 --batch_size=24 --tr_dir=[OUTPUT_DATASET_PATH/train
 
 # Infer the predictions for input test images.
 python inference.py --model_path=[.h5_FILE_PATH] --image_size=224 --input_dir=[OUTPUT_DATASET_PATH/testing] --output_dir=[PREDICTION_OUTPUT_DIR]
+
+# Please refer to approach.txt for detailed explaination of the approach.
