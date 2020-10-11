@@ -53,7 +53,8 @@ class UNet:
 
         model = Model(inputs=[inputs], outputs=[conv10])
 
-        model.compile(optimizer=Adam(lr=1e-3), loss=UNet.dice_coef_loss, metrics=[iou_score, 'acc'])
+        model.compile(optimizer=Adam(lr=1e-3), loss=UNet.dice_coef_loss,
+                      metrics=[iou_score, 'acc', UNet.precision_m, UNet.recall_m, UNet.f1_m])
 
         return model
 
@@ -68,3 +69,23 @@ class UNet:
     @staticmethod
     def dice_coef_loss(y_true, y_pred):
         return 1 - UNet.dice_coef(y_true, y_pred)
+
+    @staticmethod
+    def recall_m(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    @staticmethod
+    def precision_m(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+
+    @staticmethod
+    def f1_m(y_true, y_pred):
+        precision = UNet.precision_m(y_true, y_pred)
+        recall = UNet.recall_m(y_true, y_pred)
+        return 2 * ((precision * recall) / (precision + recall + K.epsilon()))
